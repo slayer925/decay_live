@@ -41,16 +41,14 @@
     }
 
     $memcache = new Memcache;
+
     // TEST
+    // http://www.jsoneditoronline.org/
     /*
     if ( $_GET['server']=="" ){
         $_GET['server']='NA';
         $_GET['summoner']='IRonPuPiL';
     }
-    */
-    
-    /*
-    http://www.jsoneditoronline.org/
     */
 
     $summoner_name = str_replace('_','',$_GET['summoner']);
@@ -137,8 +135,6 @@
             //die();
             break;
     }
-    //$platform = 'EUN1';
-    //$platform = 'NA1';
 
     $test = new riotapi($region);
 
@@ -153,13 +149,11 @@
     foreach ( $r as $summoner){
         $summoner_id = $summoner['id'];
     };
-    //echo $summoner_id;
 
     // GET CURRENT GAME
     try{
         $p = $test->getCurrentGame($summoner_id,$platform);
     }catch (Exception $e) {
-        //header('Location: /?err='.urlencode($e->getMessage()));
         showerror('There was a problem trying to get the current game',$e->getMessage());
     }
     $game_id = $p['gameId'];
@@ -186,7 +180,7 @@
     //LOAD CHAMPIONS
     $champs = $memcache->get('champs'.$region);
     $version = $memcache->get('version'.$region);
-    if ( $champs === false || $version === false ) {
+    if ( $champs === false || $version === false || $champs == '' || $version == '' ) {
         $response = json_decode(file_get_contents('https://global.api.pvp.net/api/lol/static-data/'.$region.'/v1.2/champion?champData=all&api_key='.$_SERVER['API_KEY']),true);
         $champs = $response['keys'];
         $memcache->set('champs'.$region, $champs);
@@ -197,10 +191,11 @@
     //LOAD SUMMONER SPELLS
     $spells = $memcache->get('spells'.$region);
     $version_s = $memcache->get('version_s'.$region);
-    if ( $spells === false || $version_s === false) {
+    if ( $spells === false || $version_s === false || $spells == '' || $version_s == '' ) {
         $response = json_decode(file_get_contents('https://global.api.pvp.net/api/lol/static-data/'.$region.'/v1.2/summoner-spell?locale=en_US&api_key='.$_SERVER['API_KEY']),true);
         foreach ($response['data'] as $spell_info) {
-            $spells[$spell_info['id']] = $spell_info['key'];
+            $spells[$spell_info['id']]['key'] = $spell_info['key'];
+            $spells[$spell_info['id']]['name'] = $spell_info['name'];
         }
         $memcache->set('spells'.$region, $spells);
         $version_s = $response['version'];
@@ -210,7 +205,7 @@
     //LOAD RUNES
     $runes = $memcache->get('runes'.$region);
     $version_r = $memcache->get('version_r'.$region);
-    if ( $runes === false || $version_r === false ) {
+    if ( $runes === false || $version_r === false || $runes == '' || $version_r == ''  ) {
         $response = json_decode(file_get_contents('https://global.api.pvp.net/api/lol/static-data/'.$region.'/v1.2/rune?locale=en_US&runeListData=all&api_key='.$_SERVER['API_KEY']),true);
         $runes = $response['data'];
         $memcache->set('runes'.$region, $runes);
@@ -221,7 +216,7 @@
     //LOAD MASTERIES
     $masteries = $memcache->get('masteries'.$region);
     $version_m = $memcache->get('version_m'.$region);
-    if ( $masteries === false || $version_m === false ) {
+    if ( $masteries === false || $version_m === false || $masteries == '' || $version_m == ''  ) {
         $response = json_decode(file_get_contents('https://global.api.pvp.net/api/lol/static-data/'.$region.'/v1.2/mastery?locale=en_US&masteryListData=all&api_key='.$_SERVER['API_KEY']),true);
         $masteries = $response['data'];
         $memcache->set('masteries'.$region, $masteries);
@@ -238,7 +233,6 @@
 
 
         <!-- Static navbar -->
-
         <section class="page">
             <div id="wrapper">
                 <div class="content-wrapper container">
@@ -290,7 +284,7 @@
 
                                     $hash = $hash . $participant['summonerId'];
                                     if ( $participant['summonerId'] == $summoner_id ){
-                                        // This is the team
+                                        // This is the player's team
                                         $ownteam = true;
                                     }
 
@@ -305,7 +299,8 @@
                                             // call example:
                                             // https://tr.api.pvp.net/championmastery/location/TR1/player/4502382/champion/67?api_key=
                                     }catch (Exception $e) {
-                                        //echo $e->getMessage(); // returns 415 wtf
+                                        //echo $e->getMessage();
+                                        // $m = $test->getChampionMastery returns 415 wtf!?
                                     }
                                     
 
@@ -416,10 +411,10 @@
                                     
                                     <div class="summoners">
                                         <span>
-                                            <img class="summoner1" src="http://ddragon.leagueoflegends.com/cdn/<?php echo $version_s;?>/img/spell/<?php echo $spells[$participant['spell1Id']];?>.png">
+                                            <img class="summoner1" src="http://ddragon.leagueoflegends.com/cdn/<?php echo $version_s;?>/img/spell/<?php echo $spells[$participant['spell1Id']]['key'];?>.png" title="<?php echo $spells[$participant['spell1Id']]['name'];?>">
                                         </span>
                                         <span>
-                                            <img class="summoner2" src="http://ddragon.leagueoflegends.com/cdn/<?php echo $version_s;?>/img/spell/<?php echo $spells[$participant['spell2Id']];?>.png">
+                                            <img class="summoner2" src="http://ddragon.leagueoflegends.com/cdn/<?php echo $version_s;?>/img/spell/<?php echo $spells[$participant['spell2Id']]['key'];?>.png" title="<?php echo $spells[$participant['spell2Id']]['name'];?>">
                                         </span>
                                     </div>
                                     <h4 class="pull-right"><?php echo $kda;?> KDA</h4><br>
@@ -475,7 +470,6 @@
                                                             break;
                                                     }
                                                 }
-                                                //echo $series;
                                             }else{
                                                 if ($ishotstreak){
                                                     echo '<i class="fa fa-rocket red" title="HotStreak: 3+ wins in a row"></i>';
@@ -586,11 +580,6 @@
                                 echo '$( ".'.clean($league).'" ).css("display","block");';
                                 $i++;
                             }
-                            /*
-                            if ( $ownteam ){
-                                echo '$("#discord_link").attr("href", "http://live.decayoflegends.com/voice?server='.$voice_server.'&hash='.$hash.'");';
-                            }
-                            */
                             echo '}
                             </script>';
                             if ( $ownteam ){
@@ -778,10 +767,10 @@
                                     
                                     <div class="summoners">
                                         <span>
-                                            <img class="summoner1" src="http://ddragon.leagueoflegends.com/cdn/<?php echo $version_s;?>/img/spell/<?php echo $spells[$participant['spell1Id']];?>.png">
+                                            <img class="summoner1" src="http://ddragon.leagueoflegends.com/cdn/<?php echo $version_s;?>/img/spell/<?php echo $spells[$participant['spell1Id']]['key'];?>.png" title="<?php echo $spells[$participant['spell1Id']]['name'];?>">
                                         </span>
                                         <span>
-                                            <img class="summoner2" src="http://ddragon.leagueoflegends.com/cdn/<?php echo $version_s;?>/img/spell/<?php echo $spells[$participant['spell2Id']];?>.png">
+                                            <img class="summoner2" src="http://ddragon.leagueoflegends.com/cdn/<?php echo $version_s;?>/img/spell/<?php echo $spells[$participant['spell2Id']]['key'];?>.png" title="<?php echo $spells[$participant['spell2Id']]['name'];?>">
                                         </span>
                                     </div>
                                     <h4 class="pull-right"><?php echo $kda;?> KDA</h4><br>
@@ -988,8 +977,6 @@
             </div>
         </section>
 
-
-
         
         <script>
         function OpenInNewTab(url) {
@@ -1021,7 +1008,6 @@
         document.querySelector('.simple-alert').onclick = function () {
             swal({
                 title: "Press Windows key + R and paste the following code:",
-                //text: '"C:\\Riot Games\\League of Legends\\RADS\\solutions\\lol_game_client_sln\\releases\\0.0.1.119\\deploy\\League of Legends.exe" "8394" "LoLLauncher.exe" "" "spectator spectator.<?php echo strtolower($platform);?>.lol.riotgames.com:80 <?php echo $game_key . " " . $game_id . " " . $platform;?>\"'
                 text: '"C:\\Riot Games\\League of Legends\\RADS\\solutions\\lol_game_client_sln\\releases\\0.0.1.130\\deploy\\League of Legends.exe" "8394" "LoLLauncher.exe" "" "spectator <?php echo $spectator_url;?> <?php echo $game_key . " " . $game_id . " " . $platform;?>\"'
             });
         };
