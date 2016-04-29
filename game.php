@@ -51,6 +51,7 @@
     }
     */
 
+
     $summoner_name = str_replace('_','',$_GET['summoner']);
     $region = strtolower($_GET['server']);
 
@@ -59,82 +60,113 @@
             $platform = 'NA1';
             $voice_server = 'NA';
             $spectator_url = 'spectator.na.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_NA');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'euw':
             $platform = 'EUW1';
             $voice_server = 'EU';
             $spectator_url = 'spectator.eu.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'eune':
             $platform = 'EUN1';
             $voice_server = 'EU';
             $spectator_url = 'spectator.eu.lol.riotgames.com:8088';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUNE');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
         
         case 'br':
             $platform = 'BR1';
             $voice_server = 'LA';
             $spectator_url = 'spectator.br.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_BR');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
         
         case 'tr':
             $platform = 'TR1';
             $voice_server = 'EU';
             $spectator_url = 'spectator.tr.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_TR');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
         
         case 'oce':
             $platform = 'OC1';
             $voice_server = 'OCE';
             $spectator_url = 'spectator.oc1.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_OC1');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
          
         case 'kr':
             $platform = 'KR';
             $voice_server = 'NA';
             $spectator_url = 'spectator.kr.lol.riotgames.com:80';
+            // release version file not found
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'lan':
             $platform = 'LA1';
             $voice_server = 'LA';
             $spectator_url = 'spectator.br.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_LA1');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'las':
             $platform = 'LA2';
             $voice_server = 'LA';
             $spectator_url = 'spectator.br.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_LA2');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'ru':
             $platform = 'RU';
             $voice_server = 'EU';
             $spectator_url = 'spectator.tr.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_RU');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'pbe':
             $platform = 'PBE1';
             $voice_server = 'NA';
             $spectator_url = 'spectator.pbe1.lol.riotgames.com:8088';
+            // release version file not found
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'jp':
             $platform = 'JP1';
             $voice_server = 'OCE';
             $spectator_url = 'spectator.jp1.lol.riotgames.com:80';
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_JP');
+			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         default:
+            /*
             $platform = 'EUW1';
             $voice_server = 'EU';
             $spectator_url = 'spectator.eu.lol.riotgames.com:80';
-            //header('Location: index?err=Wrong%20server');
-            //die();
+            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
+			$last_release = explode(PHP_EOL, $releases, 2);
+            */
+			showerror('Region not found',strtoupper($region));
             break;
     }
+
+    $last_release = substr_replace($last_release[0], "", -1);
 
     $test = new riotapi($region);
 
@@ -580,7 +612,7 @@
                                 echo '$( ".'.clean($league).'" ).css("display","block");';
                                 $i++;
                             }
-                            echo '}
+                            echo '});
                             </script>';
                             if ( $ownteam ){
                                 echo '<input type="text" id="voice_url" style="display:none" value="http://live.decayoflegends.com/voice?server='.$voice_server.'&hash='.$hash.'">';
@@ -1005,10 +1037,11 @@
             }
             setTimeout(update, 1000);
         });
+        // http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW
         document.querySelector('.simple-alert').onclick = function () {
             swal({
                 title: "Press Windows key + R and paste the following code:",
-                text: '"C:\\Riot Games\\League of Legends\\RADS\\solutions\\lol_game_client_sln\\releases\\0.0.1.130\\deploy\\League of Legends.exe" "8394" "LoLLauncher.exe" "" "spectator <?php echo $spectator_url;?> <?php echo $game_key . " " . $game_id . " " . $platform;?>\"'
+                text: '"C:\\Riot Games\\League of Legends\\RADS\\solutions\\lol_game_client_sln\\releases\\<?php echo $last_release;?>\\deploy\\League of Legends.exe" "8394" "LoLLauncher.exe" "" "spectator <?php echo $spectator_url;?> <?php echo $game_key . " " . $game_id . " " . $platform;?>\"'
             });
         };
 
