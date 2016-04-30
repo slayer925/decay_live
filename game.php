@@ -61,7 +61,6 @@
             $voice_server = 'NA';
             $spectator_url = 'spectator.na.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_NA');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'euw':
@@ -69,7 +68,6 @@
             $voice_server = 'EU';
             $spectator_url = 'spectator.euw1.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'eune':
@@ -77,7 +75,6 @@
             $voice_server = 'EU';
             $spectator_url = 'spectator.eu.lol.riotgames.com:8088';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUNE');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
         
         case 'br':
@@ -85,7 +82,6 @@
             $voice_server = 'LA';
             $spectator_url = 'spectator.br.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_BR');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
         
         case 'tr':
@@ -93,7 +89,6 @@
             $voice_server = 'EU';
             $spectator_url = 'spectator.tr.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_TR');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
         
         case 'oce':
@@ -101,7 +96,6 @@
             $voice_server = 'OCE';
             $spectator_url = 'spectator.oc1.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_OC1');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
          
         case 'kr':
@@ -110,7 +104,6 @@
             $spectator_url = 'spectator.kr.lol.riotgames.com:80';
             // release version file not found
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'lan':
@@ -118,7 +111,6 @@
             $voice_server = 'LA';
             $spectator_url = 'spectator.la1.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_LA1');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'las':
@@ -126,7 +118,6 @@
             $voice_server = 'LA';
             $spectator_url = 'spectator.la2.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_LA2');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'ru':
@@ -134,7 +125,6 @@
             $voice_server = 'EU';
             $spectator_url = 'spectator.ru.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_RU');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'pbe':
@@ -143,7 +133,6 @@
             $spectator_url = 'spectator.pbe1.lol.riotgames.com:8088';
             // release version file not found
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         case 'jp':
@@ -151,7 +140,6 @@
             $voice_server = 'OCE';
             $spectator_url = 'spectator.jp1.lol.riotgames.com:80';
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_JP');
-			$last_release = explode(PHP_EOL, $releases, 2);
             break;
 
         default:
@@ -165,8 +153,8 @@
 			showerror('Region not found',strtoupper($region));
             break;
     }
-
-    $last_release = substr_replace($last_release[0], "", -1);
+	//$last_release = explode(PHP_EOL, $releases, 2);
+    $last_release = substr_replace(explode(PHP_EOL, $releases, 2)[0], "", -1);
 
     $test = new riotapi($region);
 
