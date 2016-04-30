@@ -12,7 +12,6 @@
     //error_reporting(0); // This disables warnings and errors by php
     function clean($string) {
        $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
-
        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     }
 
@@ -41,16 +40,6 @@
     }
 
     $memcache = new Memcache;
-
-    // TEST
-    // http://www.jsoneditoronline.org/
-    /*
-    if ( $_GET['server']=="" ){
-        $_GET['server']='NA';
-        $_GET['summoner']='IRonPuPiL';
-    }
-    */
-
 
     $summoner_name = str_replace('_','',$_GET['summoner']);
     $region = strtolower($_GET['server']);
@@ -131,7 +120,7 @@
             $platform = 'PBE1';
             $voice_server = 'NA';
             $spectator_url = 'spectator.pbe1.lol.riotgames.com:8088';
-            // release version file not found
+            // release version file not found, euw one instead
             $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
             break;
 
@@ -143,17 +132,9 @@
             break;
 
         default:
-            /*
-            $platform = 'EUW1';
-            $voice_server = 'EU';
-            $spectator_url = 'spectator.eu.lol.riotgames.com:80';
-            $releases = file_get_contents('http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW');
-			$last_release = explode(PHP_EOL, $releases, 2);
-            */
-			showerror('Region not found',strtoupper($region));
+            showerror('Region not found',strtoupper($region));
             break;
     }
-	//$last_release = explode(PHP_EOL, $releases, 2);
     $last_release = substr_replace(explode(PHP_EOL, $releases, 2)[0], "", -1);
 
     $test = new riotapi($region);
@@ -162,7 +143,6 @@
     try{
         $r = $test->getSummonerByName($summoner_name);
     }catch (Exception $e) {
-        //header('Location: /?err='.urlencode($e->getMessage()));
         showerror('There was a problem trying to get the summoner ID',$e->getMessage());
     }
 
@@ -405,7 +385,6 @@
                                                     }
                                                 }
                                                 if ( $tier != 'CHALLENGER' && $tier != 'MASTER' ){
-                                                    //$league_name = $league['name'];
                                                     array_push($league_names, $league['name']);
                                                 }
                                             }
@@ -482,11 +461,10 @@
                                                             echo '<i class="fa fa-circle green" title="WIN"></i>';
                                                             break;
                                                         case 'L':
-                                                            //echo '<i class="fa fa-ban red" title="LOSS"></i>';
                                                             echo '<i class="fa fa-circle red" title="LOSS"></i>';
                                                             break;
                                                         default:
-                                                            # code...
+                                                            // nothing
                                                             break;
                                                     }
                                                 }
@@ -512,7 +490,7 @@
                                         <span class="rw">RANKED WINS / LOSSES</span>
                                         <?php echo $rankedwins . ' / ' . $rankedlosses; ?>
                                     </span>
-                                </div><!--.tile footer-->
+                                </div><!--.tile footer2-->
                                 <div class="tile-footer3">
                                     <span class="info-left">
                                         <span class="nw">RUNES</span>
@@ -586,7 +564,7 @@
                                 }//team100
                             };//foreach
 
-                            //search for premades
+                            //SEARCH FOR PREMADES
                             $array_unique = array_unique($league_names);
                             $array_diff = array_diff_assoc($league_names, $array_unique);
                             //$array_diff=$array_unique; // to show every icon
@@ -762,7 +740,6 @@
                                                     }
                                                 }
                                                 if ( $tier != 'CHALLENGER' && $tier != 'MASTER' ){
-                                                    //$league_name = $league['name'];
                                                     array_push($league_names, $league['name']);
                                                 }
                                             }
@@ -838,7 +815,6 @@
                                                             echo '<i class="fa fa-circle green" title="WIN"></i>';
                                                             break;
                                                         case 'L':
-                                                            //echo '<i class="fa fa-ban red" title="LOSS"></i>';
                                                             echo '<i class="fa fa-circle red" title="LOSS"></i>';
                                                             break;
                                                         default:
@@ -846,7 +822,6 @@
                                                             break;
                                                     }
                                                 }
-                                                //echo $series;
                                             }else{
                                                 if ($ishotstreak){
                                                     echo '<i class="fa fa-rocket red" title="HotStreak: 3+ wins in a row"></i>';
@@ -869,7 +844,7 @@
                                         <span class="rw">RANKED WINS / LOSSES</span>
                                         <?php echo $rankedwins . ' / ' . $rankedlosses; ?>
                                     </span>
-                                </div><!--.tile footer-->
+                                </div><!--.tile footer2-->
                                 <div class="tile-footer3">
                                     <span class="info-left">
                                         <span class="nw">RUNES</span>
@@ -943,7 +918,7 @@
                                 }//team100
                             };//foreach
 
-                            //search for premades
+                            //SEARCH FOR PREMADES
                             $array_unique = array_unique($league_names);
                             $array_diff = array_diff_assoc($league_names, $array_unique);
                             //$array_diff=$array_unique; // to show every icon
@@ -957,11 +932,6 @@
                                 echo '$( ".'.clean($league).'" ).css("display","block");';
                                 $i++;
                             }
-                            /*
-                            if ( $ownteam ){
-                                echo '$("#discord_link").attr("href", "http://live.decayoflegends.com/voice?server='.$voice_server.'&hash='.$hash.'");';
-                            }
-                            */
                             echo '}
                             </script>';
                             if ( $ownteam ){
@@ -1025,7 +995,6 @@
             }
             setTimeout(update, 1000);
         });
-        // http://l3cdn.riotgames.com/releases/live/solutions/lol_game_client_sln/releases/releaselisting_EUW
         document.querySelector('.simple-alert').onclick = function () {
             swal({
                 title: "Press Windows key + R and paste the following code:",
